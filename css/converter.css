@@ -1,0 +1,175 @@
+.converter-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+.rate-info {
+    text-align: center;
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* 新增匯率設定區塊樣式 */
+.exchange-rate-settings {
+    background-color: #e8f5e9; /* 淺綠色背景 */
+    border: 1px solid #c8e6c9;
+    border-radius: 8px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+    text-align: left; /* 內容左對齊 */
+}
+
+.exchange-rate-settings h2 {
+    font-size: 1.3em;
+    color: #388e3c; /* 深綠色標題 */
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.rate-input-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 讓內容在中間 */
+    font-size: 1.1em;
+}
+
+.rate-input-group label {
+    display: flex; /* 讓 label 內部元素可以並排 */
+    align-items: center;
+    gap: 8px; /* 元素間距 */
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.rate-input-group input[type="number"] {
+    width: 100px; /* 輸入框寬度 */
+    padding: 8px 10px;
+    border: 1px solid #a5d6a7;
+    border-radius: 5px;
+    font-size: 1em;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.rate-input-group input[type="number"]::-webkit-outer-spin-button,
+.rate-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.rate-input-group input[type="number"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.exchange-rate-settings .note {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 20px;
+    text-align: center;
+}
+/* 匯率設定區塊樣式結束 */
+
+
+.currency-converter-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 35px;
+    width: 100%;
+    max-width: 500px; /* 限制最大寬度 */
+    box-sizing: border-box; /* 包含 padding 和 border 在寬度內 */
+}
+
+.currency-input-group {
+    margin-bottom: 20px;
+}
+
+.currency-input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #444;
+    font-size: 1.05em;
+}
+
+.currency-input-group input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1.2em;
+    box-sizing: border-box;
+    -moz-appearance: textfield;
+}
+
+/* 移除 Chrome, Safari, Edge 的數字輸入框箭頭 */
+.currency-input-group input[type="number"]::-webkit-outer-spin-button,
+.currency-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.currency-input-group input[type="number"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* 響應式設計 - 手機版 (小於 768px 寬度) */
+@media (max-width: 768px) {
+    .exchange-rate-settings {
+        padding: 20px 15px;
+        max-width: 95%;
+    }
+
+    .exchange-rate-settings h2 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+
+    .rate-input-group {
+        font-size: 1em;
+        margin-bottom: 12px;
+    }
+
+    .rate-input-group input[type="number"] {
+        width: 80px;
+        padding: 6px 8px;
+        font-size: 0.95em;
+    }
+
+    .currency-converter-box {
+        padding: 25px;
+        max-width: 95%;
+    }
+
+    .rate-info {
+        font-size: 0.9em;
+        margin-bottom: 25px;
+    }
+
+    .currency-input-group {
+        margin-bottom: 18px;
+    }
+
+    .currency-input-group label {
+        font-size: 1em;
+        margin-bottom: 6px;
+    }
+
+    .currency-input-group input[type="number"] {
+        padding: 10px 12px;
+        font-size: 1.1em;
+    }
+}

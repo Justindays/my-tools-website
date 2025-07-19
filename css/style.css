@@ -1,0 +1,133 @@
+/* 基本設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 標頭 */
+.header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2.2em;
+}
+
+/* 主要內容區塊 */
+.main-content {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.welcome-message {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+/* 工具卡片列表 */
+.tool-list {
+    display: flex;
+    flex-wrap: wrap; /* 允許換行 */
+    justify-content: center;
+    gap: 25px; /* 卡片間距 */
+    margin-top: 30px;
+}
+
+.tool-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px;
+    text-decoration: none; /* 移除連結下劃線 */
+    color: #333;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 280px; /* 固定寬度，方便排版 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.tool-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.tool-title {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #4CAF50;
+}
+
+.tool-description {
+    font-size: 0.95em;
+    color: #666;
+}
+
+/* 頁尾 */
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+    font-size: 0.9em;
+}
+
+/* 響應式設計 - 手機版 (小於 768px 寬度) */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .main-content {
+        padding: 20px 15px;
+    }
+
+    .welcome-message {
+        font-size: 1.1em;
+        margin-bottom: 20px;
+    }
+
+    .tool-list {
+        flex-direction: column; /* 堆疊排列 */
+        align-items: center; /* 居中對齊 */
+        gap: 20px;
+    }
+
+    .tool-card {
+        width: 90%; /* 佔據大部分寬度 */
+        max-width: 350px; /* 限制最大寬度 */
+        padding: 25px;
+    }
+
+    .tool-icon {
+        font-size: 2.5em;
+    }
+
+    .tool-title {
+        font-size: 1.3em;
+    }
+}
