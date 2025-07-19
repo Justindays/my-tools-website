@@ -14,7 +14,7 @@
 
     <main class="main-content converter-page">
         <p class="rate-info">
-            資料來源：手動輸入（**未來將自動從銀行或API獲取**）<br>
+            資料來源：<span id="data-source-info">手動輸入</span>（未來將自動從銀行或API獲取）<br>
             <span id="last-updated">資料更新時間：載入中...</span>
         </p>
 
@@ -41,16 +41,19 @@
         </div>
 
         <div class="exchange-rate-settings">
-            <h2>當前匯率設定（以**其他貨幣 1 元**為基準）</h2> <div class="rate-input-group">
-                <label for="rate-USD-to-TWD">1 美金 = <input type="number" id="rate-USD-to-TWD" value="32.50" step="0.001"> 台幣</label> </div>
+            <h2>當前匯率設定（以**其他貨幣 1 元**為基準）</h2>
             <div class="rate-input-group">
-                <label for="rate-JPY-to-TWD">1 日幣 = <input type="number" id="rate-JPY-to-TWD" value="0.21" step="0.0001"> 台幣</label> </div>
+                <label for="rate-USD-to-TWD">1 美金 = <input type="number" id="rate-USD-to-TWD" value="32.50" step="0.001"> 台幣</label>
+            </div>
             <div class="rate-input-group">
-                <label for="rate-CNY-to-TWD">1 人民幣 = <input type="number" id="rate-CNY-to-TWD" value="4.45" step="0.001"> 台幣</label> </div>
-            <p class="note">請手動調整上方匯率，轉換器將即時更新。</p>
-            <p>
-                <a href="https://www.ctbcbank.com/twrbo/zh_tw/dep_index/dep_ratequery/dep_foreign_rates.html" target="_blank">點此前往 Google 匯率查詢</a>
-            </p>
+                <label for="rate-JPY-to-TWD">1 日幣 = <input type="number" id="rate-JPY-to-TWD" value="0.21" step="0.0001"> 台幣</label>
+            </div>
+            <div class="rate-input-group">
+                <label for="rate-CNY-to-TWD">1 人民幣 = <input type="number" id="rate-CNY-to-TWD" value="4.45" step="0.001"> 台幣</label>
+            </div>
+            <button id="update-rates-btn" class="button-primary">從網站更新匯率</button> <p class="note">點擊上方按鈕可從線上獲取最新匯率。</p> <p>
+                <a href="https://www.google.com/finance/markets/currencies" target="_blank">點此前往 Google 匯率查詢</a>
+                <a href="https://www.frankfurter.app/docs/" target="_blank">Frankfurter.app API 說明</a> </p>
         </div>
     </main>
 

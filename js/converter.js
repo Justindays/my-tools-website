@@ -5,11 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const JPY_input = document.getElementById('JPY');
     const CNY_input = document.getElementById('CNY');
     const lastUpdatedSpan = document.getElementById('last-updated');
+    const dataSourceInfoSpan = document.getElementById('data-source-info'); // 資料來源顯示元素
 
     // 匯率設定輸入框 - 現在它們是「1 [貨幣] = X 台幣」
     const rateUSD_to_TWD_input = document.getElementById('rate-USD-to-TWD');
     const rateJPY_to_TWD_input = document.getElementById('rate-JPY-to-TWD');
     const rateCNY_to_TWD_input = document.getElementById('rate-CNY-to-TWD');
+
+    // 更新匯率按鈕
+    const updateRatesButton = document.getElementById('update-rates-btn');
 
     // 儲存當前匯率的物件，定義為：1 [貨幣] = X TWD
     let exchangeRates = {
@@ -19,10 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 函數：從匯率設定輸入框讀取並更新 exchangeRates 物件
-    function initializeExchangeRates() {
+    function initializeExchangeRatesFromInputs() {
         exchangeRates.USD_to_TWD = parseFloat(rateUSD_to_TWD_input.value) || 0;
         exchangeRates.JPY_to_TWD = parseFloat(rateJPY_to_TWD_input.value) || 0;
         exchangeRates.CNY_to_TWD = parseFloat(rateCNY_to_TWD_input.value) || 0;
+        // 注意：這裡不應直接改變 dataSourceInfoSpan，因為它可能在 API 更新後被設置為 Frankfurter.app
+        // dataSourceInfoSpan.textContent = '手動輸入'; 
     }
 
     // 函數：更新最後更新時間的顯示
@@ -61,51 +67,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let twd_amount_calculated = 0; // 以台幣為中間基準進行換算
 
+        // 檢查匯率是否有效，避免除以零或無窮大
+        const checkRate = (rate, currencyName) => {
+            if (rate === 0 || !isFinite(rate)) {
+                console.warn(`Warning: Exchange rate for ${currencyName} is zero or invalid.`);
+                return false;
+            }
+            return true;
+        };
+
         switch (inputElementId) {
             case 'TWD':
                 twd_amount_calculated = inputValue;
-                // 台幣換美金：台幣 / (1 美金 = X 台幣)
-                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
-                // 台幣換日幣：台幣 / (1 日幣 = X 台幣)
-                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
-                // 台幣換人民幣：台幣 / (1 人民幣 = X 台幣)
-                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
+                if (checkRate(exchangeRates.USD_to_TWD, 'USD')) USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                if (checkRate(exchangeRates.JPY_to_TWD, 'JPY')) JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
+                if (checkRate(exchangeRates.CNY_to_TWD, 'CNY')) CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'USD':
-                // 美金換台幣：美金 * (1 美金 = X 台幣)
+                if (!checkRate(exchangeRates.USD_to_TWD, 'USD')) return;
                 twd_amount_calculated = inputValue * exchangeRates.USD_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                // 美金換日幣 (透過台幣)：(美金 * USD_to_TWD) / JPY_to_TWD
-                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
-                // 美金換人民幣 (透過台幣)：(美金 * USD_to_TWD) / CNY_to_TWD
-                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
+                if (checkRate(exchangeRates.JPY_to_TWD, 'JPY')) JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
+                if (checkRate(exchangeRates.CNY_to_TWD, 'CNY')) CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'JPY':
-                // 日幣換台幣：日幣 * (1 日幣 = X 台幣)
+                if (!checkRate(exchangeRates.JPY_to_TWD, 'JPY')) return;
                 twd_amount_calculated = inputValue * exchangeRates.JPY_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                // 日幣換美金 (透過台幣)：(日幣 * JPY_to_TWD) / USD_to_TWD
-                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
-                // 日幣換人民幣 (透過台幣)：(日幣 * JPY_to_TWD) / CNY_to_TWD
-                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
+                if (checkRate(exchangeRates.USD_to_TWD, 'USD')) USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                if (checkRate(exchangeRates.CNY_to_TWD, 'CNY')) CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'CNY':
-                // 人民幣換台幣：人民幣 * (1 人民幣 = X 台幣)
+                if (!checkRate(exchangeRates.CNY_to_TWD, 'CNY')) return;
                 twd_amount_calculated = inputValue * exchangeRates.CNY_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                // 人民幣換美金 (透過台幣)：(人民幣 * CNY_to_TWD) / USD_to_TWD
-                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
-                // 人民幣換日幣 (透過台幣)：(人民幣 * CNY_to_TWD) / JPY_to_TWD
-                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
+                if (checkRate(exchangeRates.USD_to_TWD, 'USD')) USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                if (checkRate(exchangeRates.JPY_to_TWD, 'JPY')) JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
                 break;
         }
     }
 
-    // 函數：當匯率設定改變時，更新匯率並重新計算所有貨幣
-    function updateExchangeRatesAndRecalculate() {
-        initializeExchangeRates(); // 重新從輸入框讀取最新匯率
-
-        // 根據目前有值的輸入框，以它為基準重新換算
+    // 函數：根據當前有值的輸入框，以它為基準重新換算所有貨幣
+    function recalculateAllCurrenciesBasedOnCurrentInput() {
         if (TWD_input.value !== '') {
             convertCurrency('TWD');
         } else if (USD_input.value !== '') {
@@ -121,13 +124,97 @@ document.addEventListener('DOMContentLoaded', () => {
             JPY_input.value = '';
             CNY_input.value = '';
         }
-        updateLastUpdatedTime(); // 匯率更新後，也更新時間戳
     }
 
-    // 事件監聽器：監聽匯率設定輸入框的變化
-    rateUSD_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
-    rateJPY_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
-    rateCNY_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
+    // 函數：從 Frankfurter.app 獲取匯率
+    async function fetchExchangeRates() {
+        // Frankfurter.app 使用 v1 版本，基礎 URL 為 https://api.frankfurter.dev/v1/
+        const API_BASE_URL = 'https://api.frankfurter.dev/v1/latest';
+        const baseCurrency = 'TWD'; // 我們想要 1 TWD 等於多少 USD/JPY/CNY
+        const targetCurrencies = ['USD', 'JPY', 'CNY']; // 要獲取的目標貨幣
+
+        // 組合完整的 API URL
+        const API_URL = `${API_BASE_URL}?from=${baseCurrency}&to=${targetCurrencies.join(',')}`;
+
+        try {
+            updateRatesButton.disabled = true; // 禁用按鈕，防止重複點擊
+            updateRatesButton.textContent = '更新中...'; // 更新按鈕文字
+
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                // 如果 API 返回的狀態碼不是 200 OK，拋出錯誤
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+            const data = await response.json();
+
+            // 確保 rates 物件存在且包含所需貨幣
+            if (!data.rates) {
+                throw new Error("API response is missing 'rates' data.");
+            }
+
+            // Frankfurter.app 返回的數據是基於 'from' 貨幣的，例如 1 TWD = X USD
+            // 我們頁面需要的是 1 USD = X TWD，所以需要計算其「倒數」：1 / data.rates.USD
+            let updatedCount = 0;
+            if (data.rates.USD) {
+                rateUSD_to_TWD_input.value = (1 / data.rates.USD).toFixed(4); // 保留4位小數
+                updatedCount++;
+            } else {
+                console.warn("Frankfurter.app did not return USD rate for TWD base.");
+            }
+            if (data.rates.JPY) {
+                rateJPY_to_TWD_input.value = (1 / data.rates.JPY).toFixed(4);
+                updatedCount++;
+            } else {
+                console.warn("Frankfurter.app did not return JPY rate for TWD base.");
+            }
+            if (data.rates.CNY) {
+                rateCNY_to_TWD_input.value = (1 / data.rates.CNY).toFixed(4);
+                updatedCount++;
+            } else {
+                console.warn("Frankfurter.app did not return CNY rate for TWD base.");
+            }
+
+            if (updatedCount > 0) {
+                dataSourceInfoSpan.textContent = 'Frankfurter.app'; // 更新資料來源顯示
+                updateLastUpdatedTime(); // 更新時間戳
+                initializeExchangeRatesFromInputs(); // 從更新後的輸入框初始化匯率
+                recalculateAllCurrenciesBasedOnCurrentInput(); // 重新計算所有貨幣
+                console.log('匯率更新成功！', data);
+                alert('匯率更新成功！'); // 給用戶一個提示
+            } else {
+                // 如果沒有任何匯率被更新
+                throw new Error("API returned no usable rates for USD, JPY, CNY.");
+            }
+
+        } catch (error) {
+            console.error('更新匯率失敗:', error);
+            alert('更新匯率失敗，請檢查網路或稍後再試。\n錯誤訊息: ' + error.message);
+            dataSourceInfoSpan.textContent = '手動輸入 (更新失敗)'; // 顯示更新失敗
+        } finally {
+            updateRatesButton.disabled = false; // 重新啟用按鈕
+            updateRatesButton.textContent = '從網站更新匯率'; // 恢復按鈕文字
+        }
+    }
+
+    // 事件監聽器：監聽匯率設定輸入框的變化 (手動調整匯率時)
+    rateUSD_to_TWD_input.addEventListener('input', () => {
+        initializeExchangeRatesFromInputs();
+        recalculateAllCurrenciesBasedOnCurrentInput();
+        updateLastUpdatedTime(); // 手動修改後也更新時間戳
+        dataSourceInfoSpan.textContent = '手動輸入'; // 手動調整後，來源改回手動
+    });
+    rateJPY_to_TWD_input.addEventListener('input', () => {
+        initializeExchangeRatesFromInputs();
+        recalculateAllCurrenciesBasedOnCurrentInput();
+        updateLastUpdatedTime();
+        dataSourceInfoSpan.textContent = '手動輸入';
+    });
+    rateCNY_to_TWD_input.addEventListener('input', () => {
+        initializeExchangeRatesFromInputs();
+        recalculateAllCurrenciesBasedOnCurrentInput();
+        updateLastUpdatedTime();
+        dataSourceInfoSpan.textContent = '手動輸入';
+    });
 
     // 事件監聽器：監聽貨幣輸入框的變化 (實時換算)
     TWD_input.addEventListener('input', () => convertCurrency('TWD'));
@@ -135,8 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
     JPY_input.addEventListener('input', () => convertCurrency('JPY'));
     CNY_input.addEventListener('input', () => convertCurrency('CNY'));
 
+    // 新增事件監聽器：監聽「更新匯率」按鈕點擊事件
+    updateRatesButton.addEventListener('click', fetchExchangeRates);
+
     // 頁面完全載入時，執行初始化動作
+    initializeExchangeRatesFromInputs(); // 根據 HTML 中設定的預設值初始化匯率
+    recalculateAllCurrenciesBasedOnCurrentInput(); // 根據初始匯率和輸入框的預設值（如果有的話）進行一次換算
     updateLastUpdatedTime(); // 初始載入時先更新時間
-    initializeExchangeRates(); // 根據 HTML 中設定的預設值初始化匯率
-    updateExchangeRatesAndRecalculate(); // 根據初始匯率和輸入框的預設值（如果有的話）進行一次換算
 });
