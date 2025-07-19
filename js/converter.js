@@ -6,23 +6,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const CNY_input = document.getElementById('CNY');
     const lastUpdatedSpan = document.getElementById('last-updated');
 
-    // 獲取匯率設定輸入框元素 (現在這些值直接是 1 TWD = X 貨幣)
-    const rateUSD_input = document.getElementById('rate-USD');
-    const rateJPY_input = document.getElementById('rate-JPY');
-    const rateCNY_input = document.getElementById('rate-CNY');
+    // 匯率設定輸入框 - 現在它們是「1 [貨幣] = X 台幣」
+    const rateUSD_to_TWD_input = document.getElementById('rate-USD-to-TWD');
+    const rateJPY_to_TWD_input = document.getElementById('rate-JPY-to-TWD');
+    const rateCNY_to_TWD_input = document.getElementById('rate-CNY-to-TWD');
 
-    // 儲存當前匯率的物件，定義為：1 TWD = X [貨幣]
+    // 儲存當前匯率的物件，定義為：1 [貨幣] = X TWD
     let exchangeRates = {
-        TWD_to_USD: 0, // 1 台幣 = X 美金
-        TWD_to_JPY: 0, // 1 台幣 = X 日幣
-        TWD_to_CNY: 0  // 1 台幣 = X 人民幣
+        USD_to_TWD: 0, // 1 美金 = X 台幣
+        JPY_to_TWD: 0, // 1 日幣 = X 台幣
+        CNY_to_TWD: 0  // 1 人民幣 = X 台幣
     };
 
     // 函數：從匯率設定輸入框讀取並更新 exchangeRates 物件
     function initializeExchangeRates() {
-        exchangeRates.TWD_to_USD = parseFloat(rateUSD_input.value) || 0;
-        exchangeRates.TWD_to_JPY = parseFloat(rateJPY_input.value) || 0;
-        exchangeRates.TWD_to_CNY = parseFloat(rateCNY_input.value) || 0;
+        exchangeRates.USD_to_TWD = parseFloat(rateUSD_to_TWD_input.value) || 0;
+        exchangeRates.JPY_to_TWD = parseFloat(rateJPY_to_TWD_input.value) || 0;
+        exchangeRates.CNY_to_TWD = parseFloat(rateCNY_to_TWD_input.value) || 0;
     }
 
     // 函數：更新最後更新時間的顯示
@@ -64,30 +64,39 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (inputElementId) {
             case 'TWD':
                 twd_amount_calculated = inputValue;
-                USD_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_USD);
-                JPY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_JPY);
-                CNY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_CNY);
+                // 台幣換美金：台幣 / (1 美金 = X 台幣)
+                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                // 台幣換日幣：台幣 / (1 日幣 = X 台幣)
+                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
+                // 台幣換人民幣：台幣 / (1 人民幣 = X 台幣)
+                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'USD':
-                // 美金換台幣：美金輸入值 / (1 台幣 = X 美金)
-                twd_amount_calculated = inputValue / exchangeRates.TWD_to_USD;
+                // 美金換台幣：美金 * (1 美金 = X 台幣)
+                twd_amount_calculated = inputValue * exchangeRates.USD_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                JPY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_JPY);
-                CNY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_CNY);
+                // 美金換日幣 (透過台幣)：(美金 * USD_to_TWD) / JPY_to_TWD
+                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
+                // 美金換人民幣 (透過台幣)：(美金 * USD_to_TWD) / CNY_to_TWD
+                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'JPY':
-                // 日幣換台幣：日幣輸入值 / (1 台幣 = X 日幣)
-                twd_amount_calculated = inputValue / exchangeRates.TWD_to_JPY;
+                // 日幣換台幣：日幣 * (1 日幣 = X 台幣)
+                twd_amount_calculated = inputValue * exchangeRates.JPY_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                USD_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_USD);
-                CNY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_CNY);
+                // 日幣換美金 (透過台幣)：(日幣 * JPY_to_TWD) / USD_to_TWD
+                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                // 日幣換人民幣 (透過台幣)：(日幣 * JPY_to_TWD) / CNY_to_TWD
+                CNY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.CNY_to_TWD);
                 break;
             case 'CNY':
-                // 人民幣換台幣：人民幣輸入值 / (1 台幣 = X 人民幣)
-                twd_amount_calculated = inputValue / exchangeRates.TWD_to_CNY;
+                // 人民幣換台幣：人民幣 * (1 人民幣 = X 台幣)
+                twd_amount_calculated = inputValue * exchangeRates.CNY_to_TWD;
                 TWD_input.value = formatCurrency(twd_amount_calculated);
-                USD_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_USD);
-                JPY_input.value = formatCurrency(twd_amount_calculated * exchangeRates.TWD_to_JPY);
+                // 人民幣換美金 (透過台幣)：(人民幣 * CNY_to_TWD) / USD_to_TWD
+                USD_input.value = formatCurrency(twd_amount_calculated / exchangeRates.USD_to_TWD);
+                // 人民幣換日幣 (透過台幣)：(人民幣 * CNY_to_TWD) / JPY_to_TWD
+                JPY_input.value = formatCurrency(twd_amount_calculated / exchangeRates.JPY_to_TWD);
                 break;
         }
     }
@@ -116,9 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 事件監聽器：監聽匯率設定輸入框的變化
-    rateUSD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
-    rateJPY_input.addEventListener('input', updateExchangeRatesAndRecalculate);
-    rateCNY_input.addEventListener('input', updateExchangeRatesAndRecalculate);
+    rateUSD_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
+    rateJPY_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
+    rateCNY_to_TWD_input.addEventListener('input', updateExchangeRatesAndRecalculate);
 
     // 事件監聽器：監聽貨幣輸入框的變化 (實時換算)
     TWD_input.addEventListener('input', () => convertCurrency('TWD'));
