@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
         exchangeRates.USD_to_TWD = parseFloat(rateUSD_to_TWD_input.value) || 0;
         exchangeRates.JPY_to_TWD = parseFloat(rateJPY_to_TWD_input.value) || 0;
         exchangeRates.CNY_to_TWD = parseFloat(rateCNY_to_TWD_input.value) || 0;
-        // 注意：這裡不應直接改變 dataSourceInfoSpan，因為它可能在 API 更新後被設置為 Frankfurter.app
-        // dataSourceInfoSpan.textContent = '手動輸入'; 
     }
 
     // 函數：更新最後更新時間的顯示
@@ -126,73 +124,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 函數：從 Frankfurter.app 獲取匯率
+    // 函數：從 exchangerate.host 獲取匯率
     async function fetchExchangeRates() {
-        // Frankfurter.app 使用 v1 版本，基礎 URL 為 https://api.frankfurter.dev/v1/
-        const API_BASE_URL = 'https://api.frankfurter.dev/v1/latest';
-        const baseCurrency = 'TWD'; // 我們想要 1 TWD 等於多少 USD/JPY/CNY
-        const targetCurrencies = ['USD', 'JPY', 'CNY']; // 要獲取的目標貨幣
-
-        // 組合完整的 API URL
-        const API_URL = `${API_BASE_URL}?from=${baseCurrency}&to=${targetCurrencies.join(',')}`;
+        const API_BASE_URL = 'https://api.exchangerate.host/latest';
+        const baseCurrency = 'TWD';
+        const targetCurrencies = ['USD', 'JPY', 'CNY'];
+        const API_URL = `${API_BASE_URL}?base=${baseCurrency}&symbols=${targetCurrencies.join(',')}`;
 
         try {
-            updateRatesButton.disabled = true; // 禁用按鈕，防止重複點擊
-            updateRatesButton.textContent = '更新中...'; // 更新按鈕文字
+            updateRatesButton.disabled = true;
+            updateRatesButton.textContent = '更新中...';
 
             const response = await fetch(API_URL);
             if (!response.ok) {
-                // 如果 API 返回的狀態碼不是 200 OK，拋出錯誤
                 throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
             }
+
             const data = await response.json();
 
-            // 確保 rates 物件存在且包含所需貨幣
             if (!data.rates) {
                 throw new Error("API response is missing 'rates' data.");
             }
 
-            // Frankfurter.app 返回的數據是基於 'from' 貨幣的，例如 1 TWD = X USD
-            // 我們頁面需要的是 1 USD = X TWD，所以需要計算其「倒數」：1 / data.rates.USD
+            // exchangerate.host 返回的是「1 TWD = ? 其他貨幣」
+            // 我們需要「1 USD = X TWD」，所以要對應反轉
             let updatedCount = 0;
             if (data.rates.USD) {
-                rateUSD_to_TWD_input.value = (1 / data.rates.USD).toFixed(4); // 保留4位小數
+                rateUSD_to_TWD_input.value = (1 / data.rates.USD).toFixed(4);
                 updatedCount++;
             } else {
-                console.warn("Frankfurter.app did not return USD rate for TWD base.");
+                console.warn("exchangerate.host did not return USD rate for TWD base.");
             }
             if (data.rates.JPY) {
                 rateJPY_to_TWD_input.value = (1 / data.rates.JPY).toFixed(4);
                 updatedCount++;
             } else {
-                console.warn("Frankfurter.app did not return JPY rate for TWD base.");
+                console.warn("exchangerate.host did not return JPY rate for TWD base.");
             }
             if (data.rates.CNY) {
                 rateCNY_to_TWD_input.value = (1 / data.rates.CNY).toFixed(4);
                 updatedCount++;
             } else {
-                console.warn("Frankfurter.app did not return CNY rate for TWD base.");
+                console.warn("exchangerate.host did not return CNY rate for TWD base.");
             }
 
             if (updatedCount > 0) {
-                dataSourceInfoSpan.textContent = 'Frankfurter.app'; // 更新資料來源顯示
-                updateLastUpdatedTime(); // 更新時間戳
-                initializeExchangeRatesFromInputs(); // 從更新後的輸入框初始化匯率
-                recalculateAllCurrenciesBasedOnCurrentInput(); // 重新計算所有貨幣
+                dataSourceInfoSpan.textContent = 'exchangerate.host';
+                updateLastUpdatedTime();
+                initializeExchangeRatesFromInputs();
+                recalculateAllCurrenciesBasedOnCurrentInput();
                 console.log('匯率更新成功！', data);
-                alert('匯率更新成功！'); // 給用戶一個提示
+                alert('匯率更新成功！');
             } else {
-                // 如果沒有任何匯率被更新
-                throw new Error("API returned no usable rates for USD, JPY, CNY.");
+                throw new Error("API returned no usable rates.");
             }
 
         } catch (error) {
             console.error('更新匯率失敗:', error);
             alert('更新匯率失敗，請檢查網路或稍後再試。\n錯誤訊息: ' + error.message);
-            dataSourceInfoSpan.textContent = '手動輸入 (更新失敗)'; // 顯示更新失敗
+            dataSourceInfoSpan.textContent = '手動輸入 (更新失敗)';
         } finally {
-            updateRatesButton.disabled = false; // 重新啟用按鈕
-            updateRatesButton.textContent = '從網站更新匯率'; // 恢復按鈕文字
+            updateRatesButton.disabled = false;
+            updateRatesButton.textContent = '從網站更新匯率';
         }
     }
 
