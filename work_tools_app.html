@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作計算工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 主頁面 -->
+    <div id="main-page" class="page active">
+        <div class="container">
+            <header>
+                <h1>工作計算工具</h1>
+                <p>選擇您需要的計算工具</p>
+            </header>
+            
+            <div class="tools-grid">
+                <div class="tool-card" onclick="showPage('delivery-calculator')">
+                    <div class="tool-icon">📅</div>
+                    <h3>交期計算</h3>
+                    <p>計算預定交期與相隔天數</p>
+                </div>
+                
+                <div class="tool-card" onclick="showPage('currency-converter')">
+                    <div class="tool-icon">💱</div>
+                    <h3>匯率換算</h3>
+                    <p>台幣、美金、日幣、人民幣互換</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交期計算頁面 -->
+    <div id="delivery-calculator" class="page">
+        <div class="container">
+            <header>
+                <button class="back-btn" onclick="showPage('main-page')">← 返回</button>
+                <h1>交期計算</h1>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="input-group">
+                    <label for="today-date">今天日期</label>
+                    <input type="date" id="today-date" onchange="calculateDelivery()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="delivery-date">預定交期</label>
+                    <input type="date" id="delivery-date" onchange="calculateDaysFromDates()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="days-diff">相隔天數</label>
+                    <input type="number" id="days-diff" placeholder="輸入天數" onchange="calculateDeliveryFromDays()">
+                </div>
+                
+                <div class="result">
+                    <div class="result-item">
+                        <span class="label">工作天數：</span>
+                        <span id="work-days" class="value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 匯率換算頁面 -->
+    <div id="currency-converter" class="page">
+        <div class="container">
+            <header>
+                <button class="back-btn" onclick="showPage('main-page')">← 返回</button>
+                <h1>匯率換算</h1>
+                <p class="update-time">匯率更新時間：<span id="rate-update-time">-</span></p>
+            </header>
+            
+            <div class="calculator-card">
+                <div class="currency-group">
+                    <div class="currency-item">
+                        <label for="twd">台幣 (TWD) <span class="rate-display base">基準貨幣</span></label>
+                        <input type="number" id="twd" placeholder="0" onchange="convertCurrency('twd')" step="0.01">
+                    </div>
+                    
+                    <div class="currency-item">
+                        <label for="usd">美金 (USD) <span class="rate-display">1 TWD = 0.0320 $</span></label>
+                        <input type="number" id="usd" placeholder="0" onchange="convertCurrency('usd')" step="0.01">
+                    </div>
+                    
+                    <div class="currency-item">
+                        <label for="jpy">日幣 (JPY) <span class="rate-display">1 TWD = 4.67 ¥</span></label>
+                        <input type="number" id="jpy" placeholder="0" onchange="convertCurrency('jpy')" step="0.01">
+                    </div>
+                    
+                    <div class="currency-item">
+                        <label for="cny">人民幣 (CNY) <span class="rate-display">1 TWD = 0.2300 ¥</span></label>
+                        <input type="number" id="cny" placeholder="0" onchange="convertCurrency('cny')" step="0.01">
+                    </div>
+                </div>
+                
+                <button class="refresh-btn" onclick="updateExchangeRates()">
+                    <span class="refresh-icon">🔄</span>
+                    更新匯率
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
